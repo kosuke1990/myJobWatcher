@@ -1,0 +1,12 @@
+groups:
+- name: xrp_usdt_alerts
+  rules:
+  - alert: HighXrpUsdtPrice
+    expr: avg_over_time(xrp_usdt_last_price[1m]) > 0.5
+    for: 1m
+    labels:
+      severity: critical
+      notification_channel: email
+    annotations:
+      summary: "High XRP/USDT price alert"
+      description: "XRP/USDT price is over 70. Current average price: {{ $value }}"

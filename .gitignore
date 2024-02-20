@@ -1,0 +1,4 @@
+.env
+grafana/
+grafana_data/
+venv/

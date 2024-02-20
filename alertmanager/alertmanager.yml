@@ -1,0 +1,33 @@
+global:
+  smtp_smarthost: 'smtp.example.com:587'
+  smtp_from: 'alertmanager@example.com'
+  smtp_auth_username: 'sample@gmail.com'
+  smtp_auth_password: '@@@'
+
+route:
+  receiver: 'email-notifications'  # デフォルトの通知先をemail-notificationsに設定
+  group_by: ['alertname', 'job']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 12h
+  routes:
+    - receiver: 'slack-notifications'  # notification_channelがslackの場合はSlackに通知
+      match:
+        notification_channel: 'slack'
+    - receiver: 'email-notifications'  # notification_channelがemailの場合はメールに通知（オプション）
+      match:
+        notification_channel: 'email'
+
+receivers:
+- name: 'email-notifications'
+  email_configs:
+  - to: 'sample@gmail.com'
+    send_resolved: true
+    html: "{{ range .Alerts }}<p>{{ .Annotations.summary }}</p>{{ end }}"
+
+- name: 'slack-notifications'
+  slack_configs:
+  - channel: '#alerts'
+    send_resolved: true
+    text: "{{ range .Alerts }}{{ .Annotations.summary }}\n{{ end }}"
+    api_url: 'https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX'
